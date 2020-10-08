@@ -11,6 +11,7 @@ class TripController extends Controller
 {
     public function GetTrips(Request $request)
     {
+        $sortScore = $request->sortScore;
         $tags = Tag::GetAllTag();
         $trips = Trip::GetAllTrip(Trip::OPEN);
         if ($trips->isEmpty()) {
@@ -21,6 +22,17 @@ class TripController extends Controller
             $trip['tags'] = json_decode($trip['tags']);
             $trip['group'] = Group::GetTripGroup($trip['id']);
         });
+
+        $trips = $this->sortByScore($trips, $sortScore);
         return response()->json(['code' => 0, 'msg' => '', 'data' => ['tags' => $tags, 'trips' => $trips]], 200);
+    }
+
+    public function sortByScore($trips, $sortScore)
+    {
+        // 0 => 低到高, 1 => 高到低
+        if ($sortScore == '0') {
+            return $trips->sortBy('score')->values()->all();
+        }
+        return $trips->sortByDESC('score')->values()->all();
     }
 }
