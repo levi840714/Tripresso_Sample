@@ -1,0 +1,25 @@
+version: "3"
+services:
+    mysql:
+        image: mysql:5.7
+        ports:
+            - "3308:3306"
+        command: --init-file /init.sql
+        volumes:
+            - sqldata:/var/lib/mysql/
+            - ./init.sql:/init.sql
+        environment:
+            MYSQL_ROOT_USER: root
+            MYSQL_ROOT_PASSWORD: 123456
+        restart: always
+    service:
+        build: .
+        image: tripresso_demo
+        container_name: 'Tripresso'
+        ports:
+            - "8765:8000"
+        depends_on:
+            - "mysql"
+        restart: always
+volumes:
+    sqldata:
